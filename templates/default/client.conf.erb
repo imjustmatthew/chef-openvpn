@@ -28,12 +28,43 @@ nobind
 
 comp-lzo
 
-;user nobody
-;group nogroup
+<% if @config[:user] -%>
+user <%= @config[:user] %>
+<% end -%>
+<% if @config[:group] -%>
+group <%= @config[:group] %>
+<% end -%>
 
 persist-key
 persist-tun
 
-;mute-replay-warnings
-verb 3
-mute 20
+<% if @config[:mute-replay-warnings] -%>
+mute-replay-warnings
+<% end -%>
+
+<% if @config[:reneg_sec] -%>
+reneg-sec <%= @config[:reneg_sec] %>
+<% end -%>
+
+verb <%= @config[:verb] || 3 %>
+mute <%= @config[:mute] || 20 %>
+
+<% if @config[:route_nopull] -%>
+route_nopull
+<% end -%>
+
+<% if @config[:script_security] -%>
+script-security <%= @config[:script_security] %>
+<% end -%>
+<% if @config[:script_up] -%>
+up <%= @config[:script_up] %>
+<% end -%>
+<% if @config[:script_down] -%>
+down <%= @config[:script_down] %>
+<% end -%>
+<% if @config[:script_down_pre] -%>
+down-pre <%= @config[:script_down_pre] %>
+<% end -%>
+
+
+
