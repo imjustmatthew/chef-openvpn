@@ -58,8 +58,10 @@ configurtions.each do |config_name,config|
       mode 00640
     end
     if (config[:auth][:type] == "passwd") or (config[:auth][:type] == "cert_passwd") and (config[:auth][:password_file])
-      file config[:auth][:password_file] do
-        content data_bag_item[:password]
+      password_file = config[:auth][:password_file]
+      password_content = data_bag_item[:password]
+      file "#{password_file}" do
+        content password_content
         owner "root"
         group "openvpn"
         mode 00640
