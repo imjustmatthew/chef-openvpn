@@ -84,6 +84,7 @@ configurtions.each do |config_name,config|
       mode 00660
       cookbook config[:file_cookbook] if config[:file_cookbook]
     end
+  end
 end
 
 service "openvpn" do
