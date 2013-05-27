@@ -20,9 +20,9 @@ configurtions.each do |config_name,config|
   # user_name required for given vpn server/config
   user_name = config[:user_name]
   
-  #First, try loading the crypto materials from an encrypted databag
-  data_bag_item = Chef::EncryptedDataBagItem.load("openvpn-"+config_name, user_name)
-  if data_bag_item[:ca]
+  begin
+    #First, try loading the crypto materials from an encrypted databag
+    data_bag_item = Chef::EncryptedDataBagItem.load("openvpn-"+config_name, user_name)
     file "/etc/openvpn/#{config_name}-#{user_name}-ca.crt" do
       content data_bag_item[:ca]
       owner "root"
@@ -49,8 +49,7 @@ configurtions.each do |config_name,config|
       group "openvpn"
       mode 00660
     end
-    
-  else #No data bag? Use files sourced from this cookbook or the specified provider
+  rescue #No data bag? Missing items? Use files sourced from this cookbook or the specified provider instead
     cookbook_file "/etc/openvpn/#{config_name}-#{user_name}-ca.crt" do
       source "#{config_name}-ca.crt"
       owner "root"
