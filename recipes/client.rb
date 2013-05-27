@@ -22,6 +22,13 @@ configurtions.each do |config_name,config|
   
   begin
     #First, try loading the crypto materials from an encrypted databag
+    #
+    # { "id": user_name,
+    #   "ca": ca certificate
+    #   "cert": user certificate (if needed)
+    #   "key": user key (if needed)
+    #   "password": auth-pass file contents (<username>/n<password>)
+    # }
     data_bag_item = Chef::EncryptedDataBagItem.load("openvpn-"+config_name, user_name)
     file "/etc/openvpn/#{config_name}-#{user_name}-ca.crt" do
       content data_bag_item[:ca]
@@ -43,13 +50,23 @@ configurtions.each do |config_name,config|
         mode 00640
       end
     end
-    file "/etc/openvpn/#{config_name}-#{user_name}.conf" do
-      content data_bag_item[:conf]
+    template "/etc/openvpn/#{config_name}-#{user_name}.conf" do
+      source "client.conf.erb"
+      variables :config_name => config_name, :config => config, :user_name => user_name
       owner "root"
       group "openvpn"
       mode 00640
     end
-  rescue #No data bag? Missing items? Use files sourced from this cookbook or the specified provider instead
+    if (config[:auth][:type] == "passwd") or (config[:auth][:type] == "cert_passwd") and (config[:auth][:password_file])
+      file config[:auth][:password_file] do
+        content data_bag_item[:password]
+        owner "root"
+        group "openvpn"
+        mode 00640
+      end
+    end
+  #No data bag? Use files sourced from this cookbook or the specified provider instead
+  rescue Net::HTTPServerException => e
     cookbook_file "/etc/openvpn/#{config_name}-#{user_name}-ca.crt" do
       source "#{config_name}-ca.crt"
       owner "root"
