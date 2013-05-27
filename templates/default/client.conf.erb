@@ -10,7 +10,7 @@ dev <%= @config[:dev] %>
 ;dev-node OpenVPN-TAP
 
 <% if (@config[:auth][:type] == "cert_passwd") or (@config[:auth][:type] == "passwd") -%>
-auth-user-pass
+auth-user-pass <%= @config[:auth][:password_file] %>
 ;auth-nocache
 <% end -%>
 
